@@ -1,0 +1,4 @@
+use Mix.Config
+
+config :slack,
+  token: "### YOUR SLACKBOT TOKEN ###"

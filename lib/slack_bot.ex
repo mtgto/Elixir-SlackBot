@@ -8,7 +8,7 @@ defmodule SlackBot do
 
     children = [
       # Define workers and child supervisors to be supervised
-      # worker(SlackBot.Worker, [arg1, arg2, arg3])
+      worker(SlackBot.Worker, [Mix.Config.read!("config/config.exs")])
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html

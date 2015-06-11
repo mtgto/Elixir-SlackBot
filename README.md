@@ -1,4 +1,6 @@
-SlackBot
+Elixir-SlackBot
 ========
 
-** TODO: Add description **
+# Feature
+
+- Auto reconnection

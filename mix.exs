@@ -5,29 +5,35 @@ defmodule SlackBot.Mixfile do
     [app: :slack_bot,
      version: "0.0.1",
      elixir: "~> 1.0",
+     description: description,
+     package: package,
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps]
   end
 
-  # Configuration for the OTP application
-  #
-  # Type `mix help compile.app` for more information
   def application do
-    [applications: [:logger],
-     mod: {SlackBot, []}]
+    [applications: [:logger, :slack_rtm]]
   end
 
-  # Dependencies can be Hex packages:
-  #
-  #   {:mydep, "~> 0.3.0"}
-  #
-  # Or git/path repositories:
-  #
-  #   {:mydep, git: "https://github.com/elixir-lang/mydep.git", tag: "0.1.0"}
-  #
-  # Type `mix help deps` for more examples and options
+  defp description do
+    """
+    Slack bot.
+    """
+  end
+
   defp deps do
-    []
+    [{:slack_rtm, github: "mtgto/Elixir-SlackRTM"}]
+  end
+
+  defp package do
+    [
+      files: ["lib", "mix.exs", "README.md", "LICENSE"],
+      contributors: ["mtgto"],
+      licenses: ["The MIT License"],
+      links: %{
+        "GitHub" => "https://github.com/mtgto/Elixir-SlackRTM"
+      }
+    ]
   end
 end
