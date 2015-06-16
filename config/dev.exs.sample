@@ -1,4 +1,7 @@
 use Mix.Config
 
 config :slack,
-  token: "### YOUR SLACKBOT TOKEN ###"
+  token: "### YOUR SLACKBOT TOKEN ###",
+  plugins: [
+    [name: SlackBot.SamplePlugin, config: []]
+  ]

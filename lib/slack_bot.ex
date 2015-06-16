@@ -1,19 +1,22 @@
 defmodule SlackBot do
   use Application
 
-  # See http://elixir-lang.org/docs/stable/elixir/Application.html
-  # for more information on OTP Applications
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
 
+    config = Mix.Config.read!("config/config.exs")
+
     children = [
-      # Define workers and child supervisors to be supervised
-      worker(SlackBot.Worker, [Mix.Config.read!("config/config.exs")])
+      worker(SlackBot.Worker, [config[:slack][:token]]),
+      worker(SlackBot.PluginManager, [config[:slack][:plugins]])
     ]
 
-    # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
-    # for other strategies and supported options
     opts = [strategy: :one_for_one, name: SlackBot.Supervisor]
     Supervisor.start_link(children, opts)
+  end
+
+  @spec send_message!(String.t, String.t, Maps.t) :: no_return
+  def send_message!(channel, message, _attributes \\ %{}) do
+    :ok = GenServer.cast(SlackBot.Worker, %SlackBot.SendMessage{channel: channel, message: message})
   end
 end

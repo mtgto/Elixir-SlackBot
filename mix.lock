@@ -3,6 +3,6 @@
   "idna": {:hex, :idna, "1.0.2"},
   "poison": {:hex, :poison, "1.4.0"},
   "slack": {:git, "git://github.com/mtgto/Elixir-SlackRTM.git", "65f8c3c6b3fe79068af0b854d26bf47a960ecaaf", []},
-  "slack_rtm": {:git, "git://github.com/mtgto/Elixir-SlackRTM.git", "65f8c3c6b3fe79068af0b854d26bf47a960ecaaf", []},
-  "socket": {:git, "git://github.com/meh/elixir-socket.git", "1d1a85031e862dbf1d17f1c867a5871bc52e95da", []},
+  "slack_rtm": {:git, "git://github.com/mtgto/Elixir-SlackRTM.git", "8ba9ceb3385df0596a0d8a518d322695eeccde18", []},
+  "socket": {:git, "git://github.com/meh/elixir-socket.git", "b943c8f382aad03faea6bdadbd8d07239bc02886", []},
   "ssl_verify_hostname": {:hex, :ssl_verify_hostname, "1.0.5"}}
