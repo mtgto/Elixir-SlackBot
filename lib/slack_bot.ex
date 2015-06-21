@@ -19,4 +19,8 @@ defmodule SlackBot do
   def send_message!(channel, message, _attributes \\ %{}) do
     :ok = GenServer.cast(SlackBot.Worker, %SlackBot.SendMessage{channel: channel, message: message})
   end
+
+  def me do
+    GenServer.call(SlackBot.Worker, :me)
+  end
 end

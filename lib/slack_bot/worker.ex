@@ -16,9 +16,13 @@ defmodule SlackBot.Worker do
     {:ok, state}
   end
 
+  def handle_call(:me, _from, state = %State{slack: slack}) do
+    {:reply, slack.self, state}
+  end
+
   def handle_cast(%SlackBot.SendMessage{channel: channel, message: message}, state = %State{slack: slack}) do
     {:ok, new_slack} = SlackRtm.send!(slack, message, channel)
-    {:no_reply, %State{state | slack: new_slack}}
+    {:noreply, %State{state | slack: new_slack}}
   end
 
   def terminate(reason, _state = %State{slack: slack}) do
@@ -32,9 +36,8 @@ defmodule SlackBot.Worker do
 
   def receive_event(slack) do
     received = SlackRtm.recv!(slack)
-    Logger.info "received: #{inspect received}"
+    Logger.debug "received: #{inspect received}"
     GenServer.cast(SlackBot.PluginManager, received)
     receive_event(slack)
   end
-
 end

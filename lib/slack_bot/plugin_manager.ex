@@ -16,8 +16,13 @@ defmodule SlackBot.PluginManager do
     {:ok, _pid} = GenServer.start_link(__MODULE__, state, name: SlackBot.PluginManager)
   end
 
-  def handle_cast(msg = %{"type" => "message"}, state) do
-    :ok = GenEvent.notify(SlackBot.EventManager, msg)
+  def handle_cast(msg = %{"type" => "message", "user" => user_id}, state) do
+    me = SlackBot.me
+    if me["id"] == user_id do
+      Logger.debug "Skip the message because of mine"
+    else
+      :ok = GenEvent.notify(SlackBot.EventManager, msg)
+    end
     {:noreply, state}
   end
 

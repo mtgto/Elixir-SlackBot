@@ -1,7 +1,7 @@
 Elixir-SlackBot
 ========
 
-A slack bot application by Elixir. You can extends it by plugins.
+A slack bot application by Elixir. You can extend it by plugins.
 
 ## Description
 
