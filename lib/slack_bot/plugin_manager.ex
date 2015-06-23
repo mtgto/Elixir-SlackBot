@@ -1,27 +1,29 @@
 defmodule SlackBot.PluginManager do
   defmodule State do
-    defstruct plugins: nil
+    defstruct plugins: [], channels: []
   end
 
   use GenServer
   require Logger
 
-  def start_link(plugins) do
+  def start_link(state = %State{plugins: plugins, channels: _}) do
     :ok = Logger.debug "SlackBot.PluginManager.start_link(#{inspect plugins})"
     {:ok, pid} = GenEvent.start_link(name: SlackBot.EventManager)
     :ok = Enum.each(plugins, fn([name: name, config: config]) ->
       :ok = GenEvent.add_mon_handler(pid, {SlackBot.PluginWorker, name}, [name: name, config: config])
     end)
-    state = %State{plugins: plugins}
     {:ok, _pid} = GenServer.start_link(__MODULE__, state, name: SlackBot.PluginManager)
   end
 
-  def handle_cast(msg = %{"type" => "message", "user" => user_id}, state) do
+  def handle_cast(msg = %{"type" => "message", "user" => user_id, "channel" => channel}, state = %State{channels: channels}) do
     me = SlackBot.me
-    if me["id"] == user_id do
-      Logger.debug "Skip the message because of mine"
-    else
-      :ok = GenEvent.notify(SlackBot.EventManager, msg)
+    cond do
+      me["id"] == user_id ->
+        Logger.debug "Skip the message because of mine"
+      Enum.member?(channels, channel) ->
+        :ok = GenEvent.notify(SlackBot.EventManager, msg)
+      true ->
+        Logger.debug "Skip the message because of ignoring channels"
     end
     {:noreply, state}
   end
