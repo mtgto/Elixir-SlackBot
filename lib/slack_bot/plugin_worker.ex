@@ -1,27 +1,42 @@
 defmodule SlackBot.PluginWorker do
+  @moduledoc """
+  GenServer which own a plugin.
+  """
+
   defmodule State do
     defstruct module: nil, state: nil
   end
 
-  use GenEvent
+  use GenServer
   require Logger
 
-  @spec init([module: module, config: any]) :: {:ok, State.t}
-  def init(name: module, config: config) do
+  def start_link({module, config}) do
+    :ok = Logger.debug "SlackBot.PluginWorker.start_link"
+    name = name_for_module(module)
+    GenServer.start_link(__MODULE__, {module, config}, name: name)
+  end
+
+  @spec init({Atom.t, any}) :: {:ok, State.t}
+  def init({module, config}) do
     Logger.debug "SlackBot.PluginWorker.init(#{inspect module}, #{inspect config})"
     {:ok, state} = module.init(config)
     {:ok, %State{module: module, state: state}}
   end
 
-  def handle_event(args, state = %State{module: module, state: module_state}) do
-    Logger.debug "SlackBot.PluginWorker.handle_event(#{inspect args}, #{inspect state})"
-    new_module_state = module.message(args, module_state)
-    {:ok, %State{state | state: new_module_state}}
+  @spec name_for_module(Atom.t) :: Atom.t
+  def name_for_module(module) do
+    String.to_atom("#{__MODULE__}.#{module}")
   end
 
-  def handle_call(args, state = %State{module: module, state: module_state}) do
+  def handle_cast(args, state = %State{module: module, state: module_state}) do
+    Logger.debug "SlackBot.PluginWorker.handle_cast(#{inspect args}, #{inspect state})"
+    new_module_state = module.message(args, module_state)
+    {:noreply, %State{state | state: new_module_state}}
+  end
+
+  def handle_call(args, _from, state = %State{module: module, state: module_state}) do
     Logger.debug "SlackBot.PluginWorker.handle_call(#{inspect args}, #{inspect state})"
     new_module_state = module.message(args, module_state)
-    {:ok, :ok, %State{state | state: new_module_state}}
+    {:reply, :ok, %State{state | state: new_module_state}}
   end
 end
