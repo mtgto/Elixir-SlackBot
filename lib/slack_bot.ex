@@ -8,7 +8,7 @@ defmodule SlackBot do
 
     children = [
       worker(SlackBot.Worker, [config[:slack][:token]]),
-      supervisor(SlackBot.PluginSupervisor, config[:slack][:plugins]),
+      supervisor(SlackBot.PluginSupervisor, [config[:slack][:plugins]]),
       worker(SlackBot.PluginManager, [%SlackBot.PluginManager.State{plugins: config[:slack][:plugins], channels: config[:slack][:channels]}])
     ]
 

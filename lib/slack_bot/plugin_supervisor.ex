@@ -4,7 +4,7 @@ defmodule SlackBot.PluginSupervisor do
 
   def start_link(plugins) do
     Logger.debug "SlackBot.PluginSupervisor.start_link"
-    Supervisor.start_link(__MODULE__, [plugins], name: __MODULE__)
+    Supervisor.start_link(__MODULE__, plugins, name: __MODULE__)
   end
 
   def init(plugins) do
