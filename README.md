@@ -18,9 +18,10 @@ A slack bot application by Elixir. You can extend it by plugins.
 
 ## Usage
 
-1. foo
-1. bar
-1. baz
+1. Generate a Slack API token.
+1. Create new plugin.
+1. Configure the app.
+1. Run.
 
 ## License
 The MIT License. See LICENSE for details.
