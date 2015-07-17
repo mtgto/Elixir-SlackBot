@@ -9,9 +9,11 @@ defmodule SlackBot.SamplePlugin do
 
   def message(message = %{"channel" => channel, "text" => text}, state) do
     Logger.debug "SlackBot.SamplePlugin.message(#{inspect message}) channel: #{channel}, text: #{text}"
-    if String.starts_with?(text, "krauser: ") do
+    if String.starts_with?(text, "elixir: ") do
       SlackBot.send_message!(channel, text)
+      {:reply, state}
+    else
+      {:noreply, state}
     end
-    state
   end
 end

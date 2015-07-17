@@ -36,7 +36,7 @@ defmodule SlackBot.PluginWorker do
 
   def handle_call(args, _from, state = %State{module: module, state: module_state}) do
     Logger.debug "SlackBot.PluginWorker.handle_call(#{inspect args}, #{inspect state})"
-    new_module_state = module.message(args, module_state)
-    {:reply, :ok, %State{state | state: new_module_state}}
+    {reply, new_module_state} = module.message(args, module_state)
+    {:reply, {:ok, reply}, %State{state | state: new_module_state}}
   end
 end

@@ -11,8 +11,6 @@ defmodule SlackBot.PluginManager do
   require Logger
 
   def start_link(state = %State{plugins: plugins, channels: _}) do
-    import Supervisor.Spec
-
     :ok = Logger.debug "SlackBot.PluginManager.start_link(#{inspect plugins})"
     {:ok, _pid} = GenServer.start_link(__MODULE__, state, name: SlackBot.PluginManager)
   end
@@ -23,9 +21,17 @@ defmodule SlackBot.PluginManager do
       me["id"] == user_id ->
         Logger.debug "Skip the message because of mine"
       Enum.member?(channels, channel) ->
-        plugins |> Enum.each fn([name: name, config: _config]) ->
+        has_reply = plugins |> Enum.any? fn([name: name, config: _config]) ->
           server_name = SlackBot.PluginWorker.name_for_module(name)
-          GenServer.call(server_name, msg)
+          case GenServer.call(server_name, msg) do
+            {:ok, :reply} ->
+              true
+            {:ok, :noreply} ->
+              false
+          end
+        end
+        unless has_reply do
+          Logger.debug "No plugin reply to."
         end
       true ->
         Logger.debug "Skip the message because of ignoring channels"

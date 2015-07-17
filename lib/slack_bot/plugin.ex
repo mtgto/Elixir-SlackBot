@@ -7,7 +7,7 @@ defmodule SlackBot.Plugin do
 
   defcallback usage :: String.t
 
-  defcallback message(Maps.t, any) :: any
+  defcallback message(Maps.t, any) :: {:reply | :noreply, any}
 
   defmacro __using__(_) do
     quote do
@@ -26,7 +26,7 @@ defmodule SlackBot.Plugin do
       end
 
       def message(_message, state) do
-        state
+        {:noreply, state}
       end
 
       defoverridable [init: 1, name: 0, usage: 0, message: 2]
