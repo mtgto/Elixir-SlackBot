@@ -2,7 +2,7 @@ use Mix.Config
 
 config :slack,
   token: "### YOUR SLACKBOT TOKEN ###",
-  channels: ["C12345678"]
+  channels: ["C12345678"],
   plugins: [
     [name: SlackBot.SamplePlugin, config: []]
   ]

@@ -1,4 +1,8 @@
 defmodule SlackBot.PluginManager do
+  @moduledoc """
+  PluginManager has a link to the supervisor which own plugin workers.
+  """
+
   defmodule State do
     defstruct plugins: [], channels: []
   end
@@ -8,20 +12,27 @@ defmodule SlackBot.PluginManager do
 
   def start_link(state = %State{plugins: plugins, channels: _}) do
     :ok = Logger.debug "SlackBot.PluginManager.start_link(#{inspect plugins})"
-    {:ok, pid} = GenEvent.start_link(name: SlackBot.EventManager)
-    :ok = Enum.each(plugins, fn([name: name, config: config]) ->
-      :ok = GenEvent.add_mon_handler(pid, {SlackBot.PluginWorker, name}, [name: name, config: config])
-    end)
     {:ok, _pid} = GenServer.start_link(__MODULE__, state, name: SlackBot.PluginManager)
   end
 
-  def handle_cast(msg = %{"type" => "message", "user" => user_id, "channel" => channel}, state = %State{channels: channels}) do
+  def handle_cast(msg = %{"type" => "message", "user" => user_id, "channel" => channel}, state = %State{plugins: plugins, channels: channels}) do
     me = SlackBot.me
     cond do
       me["id"] == user_id ->
         Logger.debug "Skip the message because of mine"
       Enum.member?(channels, channel) ->
-        :ok = GenEvent.notify(SlackBot.EventManager, msg)
+        has_reply = plugins |> Enum.any? fn([name: name, config: _config]) ->
+          server_name = SlackBot.PluginWorker.name_for_module(name)
+          case GenServer.call(server_name, msg) do
+            {:ok, :reply} ->
+              true
+            {:ok, :noreply} ->
+              false
+          end
+        end
+        unless has_reply do
+          Logger.debug "No plugin reply to."
+        end
       true ->
         Logger.debug "Skip the message because of ignoring channels"
     end
@@ -37,18 +48,5 @@ defmodule SlackBot.PluginManager do
     Logger.debug "SlackBot.PluginManager.handle_cast(#{inspect msg}, state)"
     Logger.debug "TYPE: #{msg["type"]}"
     {:noreply, state}
-  end
-
-  def handle_info({:gen_event_EXIT, {SlackBot.PluginWorker, handler}, reason}, state = %State{plugins: plugins}) do
-    :ok = Logger.debug "SlackBot.PluginManager.handle_info(#{inspect handler}, #{inspect reason})"
-    config = Enum.find_value(plugins, fn([name: name, config: config]) ->
-      if name == handler do
-        config
-      else
-        nil
-      end
-    end)
-    :ok = GenEvent.add_mon_handler(SlackBot.EventManager, {SlackBot.PluginWorker, handler}, [name: handler, config: config])
-    {:ok, state}
   end
 end
