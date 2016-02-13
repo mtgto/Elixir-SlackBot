@@ -21,7 +21,7 @@ defmodule SlackBot.PluginManager do
       me["id"] == user_id ->
         Logger.debug "Skip the message because of mine"
       Enum.member?(channels, channel) ->
-        has_reply = plugins |> Enum.any? fn([name: name, config: _config]) ->
+        has_reply = plugins |> Enum.any?(fn([name: name, config: _config]) ->
           server_name = SlackBot.PluginWorker.name_for_module(name)
           case GenServer.call(server_name, msg) do
             {:ok, :reply} ->
@@ -29,7 +29,7 @@ defmodule SlackBot.PluginManager do
             {:ok, :noreply} ->
               false
           end
-        end
+        end)
         unless has_reply do
           Logger.debug "No plugin reply to."
         end

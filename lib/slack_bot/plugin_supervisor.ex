@@ -9,9 +9,9 @@ defmodule SlackBot.PluginSupervisor do
 
   def init(plugins) do
     Logger.debug "SlackBot.PluginSupervisor.init(#{inspect plugins})"
-    children = plugins |> Enum.map fn([name: name, config: config]) ->
+    children = plugins |> Enum.map(fn([name: name, config: config]) ->
       worker(SlackBot.PluginWorker, [{name, config}], id: name)
-    end
+    end)
     supervise(children, strategy: :one_for_one)
   end
 end

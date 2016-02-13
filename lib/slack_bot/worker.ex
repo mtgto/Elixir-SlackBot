@@ -12,7 +12,7 @@ defmodule SlackBot.Worker do
   end
 
   def init(state = %State{slack: slack}) do
-    spawn_link(__MODULE__, :receive_event, [slack])
+    _pid = spawn_link(__MODULE__, :receive_event, [slack])
     {:ok, state}
   end
 
@@ -38,6 +38,6 @@ defmodule SlackBot.Worker do
     received = SlackRtm.recv!(slack)
     Logger.debug "received: #{inspect received}"
     GenServer.cast(SlackBot.PluginManager, received)
-    receive_event(slack)
+    receive_event(slack) # loop
   end
 end
