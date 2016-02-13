@@ -23,11 +23,16 @@ defmodule SlackBot.PluginManager do
       Enum.member?(channels, channel) ->
         has_reply = plugins |> Enum.any?(fn([name: name, config: _config]) ->
           server_name = SlackBot.PluginWorker.name_for_module(name)
-          case GenServer.call(server_name, msg) do
-            {:ok, :reply} ->
-              true
-            {:ok, :noreply} ->
-              false
+          try do
+            case GenServer.call(server_name, msg) do
+              {:ok, :reply} ->
+                true
+              {:ok, :noreply} ->
+                false
+            end
+          catch
+            :exit, _ -> Logger.info "Plugin \"#{name}\" exits."
+            false
           end
         end)
         unless has_reply do

@@ -39,4 +39,13 @@ defmodule SlackBot.PluginWorker do
     {reply, new_module_state} = module.message(args, module_state)
     {:reply, {:ok, reply}, %State{state | state: new_module_state}}
   end
+
+  def terminate(reason, state) do
+    Logger.info "SlackBot.PluginWorker.terminate(#{inspect reason}, #{inspect state})"
+  end
+
+  def handle_info(msg, state) do
+    Logger.info "SlackBot.PluginWorker.handle_info(#{inspect msg}, #{inspect state})"
+    {:ok, state}
+  end
 end
