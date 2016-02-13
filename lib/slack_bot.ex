@@ -7,9 +7,9 @@ defmodule SlackBot do
     config = Mix.Config.read!("config/config.exs")
 
     children = [
-      worker(SlackBot.Worker, [config[:slack][:token]]),
-      supervisor(SlackBot.PluginSupervisor, [config[:slack][:plugins]]),
-      worker(SlackBot.PluginManager, [%SlackBot.PluginManager.State{plugins: config[:slack][:plugins], channels: config[:slack][:channels]}])
+      worker(SlackBot.Worker, [config[:slack_bot][:token]]),
+      supervisor(SlackBot.PluginSupervisor, [config[:slack_bot][:plugins]]),
+      worker(SlackBot.PluginManager, [%SlackBot.PluginManager.State{plugins: config[:slack_bot][:plugins], channels: config[:slack_bot][:channels]}])
     ]
 
     opts = [strategy: :one_for_one, name: SlackBot.Supervisor]

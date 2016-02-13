@@ -1,6 +1,6 @@
 use Mix.Config
 
-config :slack,
+config :slack_bot,
   token: "### YOUR SLACKBOT TOKEN ###",
   channels: ["C12345678"],
   plugins: [
