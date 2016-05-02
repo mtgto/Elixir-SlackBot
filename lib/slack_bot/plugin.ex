@@ -1,4 +1,10 @@
 defmodule SlackBot.Plugin do
+  @moduledoc """
+  Default plugin behaviour.
+
+  See `example/sample_plugin.ex` for example plugin.
+  """
+
   use Behaviour
 
   defcallback init(any) :: {:ok, any}
